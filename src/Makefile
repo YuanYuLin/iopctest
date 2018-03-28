@@ -4,6 +4,9 @@ TARGET = iopctest
 CFLAGS += -I$(SDKSTAGE)/usr/include/libiopcdao
 CFLAGS += -I$(SDKSTAGE)/usr/include/libiopcmisc
 CFLAGS += -I$(SDKSTAGE)/usr/include/libiopctask
+CFLAGS += -I$(SDKSTAGE)/usr/include/libiopccmd
+CFLAGS += -I$(SDKSTAGE)/usr/include/libiopcnet
+CFLAGS += -I$(SDKSTAGE)/usr/include/libjsonc
 CFLAGS += -I$(SDKSTAGE)/usr/include/
 CFLAGS += -I./include/
 
@@ -11,8 +14,9 @@ LDFLAGS += -L$(CC_SYSROOT)/usr/lib/
 LDFLAGS += -L$(SDKSTAGE)/usr/lib/ 
 LDFLAGS += -L$(SDKSTAGE)/lib/ 
 LDFLAGS += -lc -lpthread -lrt -lz -lbz2
-LDFLAGS += -ldb -ltokyocabinet -ltokyotyrant -llua5.1
-LDFLAGS += -liopcdao -liopcmisc -liopctask
+LDFLAGS += -ljson-c -llua5.1
+#LDFLAGS += -ldb -ltokyocabinet -ltokyotyrant 
+LDFLAGS += -liopcmisc -liopcnet
 
 
 SRC = 
