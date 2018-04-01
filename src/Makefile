@@ -14,7 +14,8 @@ LDFLAGS += -L$(CC_SYSROOT)/usr/lib/
 LDFLAGS += -L$(SDKSTAGE)/usr/lib/ 
 LDFLAGS += -L$(SDKSTAGE)/lib/ 
 LDFLAGS += -lc -lpthread -lrt -lz -lbz2
-LDFLAGS += -ljson-c -llua5.1
+LDFLAGS += -ljson-c 
+#LDFLAGS += -llua5.1
 #LDFLAGS += -ldb -ltokyocabinet -ltokyotyrant 
 LDFLAGS += -liopcmisc -liopcnet
 
