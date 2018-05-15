@@ -19,15 +19,20 @@ LDFLAGS += -ljson-c
 #LDFLAGS += -ldb -ltokyocabinet -ltokyotyrant 
 LDFLAGS += -liopcmisc -liopcnet
 
+ifeq (${SUPPORT_UDS},y)
+CFLAGS += -DUTILS_UDS
+endif
+ifeq (${SUPPORT_DB},y)
+CFLAGS += -DUTILS_DB
+endif
+ifeq (${SUPPORT_INPUT},y)
+CFLAGS += -DUTILS_INPUT
+endif
 
 SRC = 
 SRC += main.c
-
-ifeq ($(SUPPORT_PLATFORM_AS_HOST),y)
-CFLAGS += -DSUPPORT_PLATFORM_AS_HOST
-endif
-ifeq ($(SUPPORT_PLATFORM_AS_GUEST),y)
-endif
-
+SRC += main_uds.c
+SRC += main_db.c
+SRC += main_input.c
 
 include Makefile.include.app
