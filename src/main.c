@@ -16,34 +16,21 @@
 #include "ops_log.h"
 #include "ops_task.h"
 #include "ops_net.h"
+#include "main.h"
 
 struct sub_fun_t {
 	uint8_t name[20];
 	int (*fun)(int argc, char** argv);
 };
 
-// ref https://github.com/troydhanson/network/blob/master/unixdomain/05.dgram/recv.c
-#ifdef UTILS_UDS
-extern int main_uds(int argc, char** argv);
-#endif
-#ifdef UTILS_DB
-extern int main_db(int argc, char** argv);
-#endif
-#ifdef UTILS_INPUT
-extern int main_input(int argc, char** argv);
-#endif
-
 static struct sub_fun_t list[] = {
-#ifdef UTILS_UDS
-	{ "main_uds", main_uds },
-#endif
-#ifdef UTILS_DB
-	{ "main_db", main_db },
-#endif
-#ifdef UTILS_INPUT
-	{ "main_input", main_input },
-#endif
-	{ "", NULL }
+	MAIN_UDS
+	MAIN_DB
+	MAIN_INPUT
+	MAIN_LXC_CREATE
+	MAIN_DRM
+	MAIN_RFB
+	MAIN_END
 };
 
 static void main_usage()

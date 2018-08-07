@@ -16,6 +16,11 @@ def set_global(args):
 def MAIN_ENV(args):
     set_global(args)
 
+    ops.exportEnv(ops.setEnv("SUPPORT_UDS", "y"))
+    ops.exportEnv(ops.setEnv("SUPPORT_DB", "n"))
+    ops.exportEnv(ops.setEnv("SUPPORT_INPUT", "n"))
+    ops.exportEnv(ops.setEnv("SUPPORT_LXC", "y"))
+
     return False
 
 def MAIN_EXTRACT(args):

@@ -19,14 +19,32 @@ LDFLAGS += -ljson-c
 #LDFLAGS += -ldb -ltokyocabinet -ltokyotyrant 
 LDFLAGS += -liopcmisc -liopcnet
 
-ifeq (${SUPPORT_UDS},y)
+ifeq ($(SUPPORT_UDS), y)
 CFLAGS += -DUTILS_UDS
 endif
-ifeq (${SUPPORT_DB},y)
+ifeq ($(SUPPORT_DB), y)
 CFLAGS += -DUTILS_DB
 endif
-ifeq (${SUPPORT_INPUT},y)
+ifeq ($(SUPPORT_INPUT), y)
 CFLAGS += -DUTILS_INPUT
+endif
+ifeq ($(SUPPORT_LXC), y)
+CFLAGS += -I$(SDKSTAGE)/usr/include/lxc
+CFLAGS += -DUTILS_LXC
+LDFLAGS += -llxc -lselinux -lseccomp -lcap -lapparmor
+LDFLAGS += -lnettle -lhogweed -lgmp -lidn -ltasn1 -lp11-kit -lffi -lpcre -lgnutls
+endif
+ifeq ($(SUPPORT_DRM), y)
+CFLAGS += -I$(SDKSTAGE)/usr/include/libdrm
+CFLAGS += -I$(SDKSTAGE)/usr/include/libdrm/libdrm
+CFLAGS += -I$(SDKSTAGE)/usr/include/libiopcdrm
+CFLAGS += -DUTILS_DRM
+LDFLAGS += -liopcdrm -ldrm
+endif
+ifeq ($(SUPPORT_RFB), y)
+CFLAGS += -I$(SDKSTAGE)/usr/include/libiopcrfb
+CFLAGS += -DUTILS_RFB
+LDFLAGS += -liopcrfb
 endif
 
 SRC = 
@@ -34,5 +52,8 @@ SRC += main.c
 SRC += main_uds.c
 SRC += main_db.c
 SRC += main_input.c
+SRC += main_lxc.c
+SRC += main_drm.c
+SRC += main_rfb.c
 
 include Makefile.include.app
