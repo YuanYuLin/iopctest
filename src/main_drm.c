@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <linux/input.h>
+#include <pthread.h>
 
 #include "ops_db.h"
 #include "ops_mq.h"
@@ -20,10 +22,32 @@
 #include "ops_rfb.h"
 #include "ops_drm.h"
 
+static int socket_fd = -1;
 static int usage_main_drm()
 {
-	printf("main_drm </dev/dri/cardX> <host> <port> \n");
+	printf("main_drm </dev/dri/cardX> <host> <port> </dev/input/eventX>\n");
 	return -1;
+}
+
+void* input_task(void* arg)
+{
+	uint8_t* event = (uint8_t*)arg;
+	struct ops_rfb_t *rfb = get_rfb_instance();
+	int fd = -1;
+	struct input_event ev;
+	int rc = 0;
+	int wc = 0;
+
+	fd = open(event, O_RDONLY);
+	while(1){
+		rc = read(fd, &ev, sizeof(struct input_event));
+		if(ev.type == 1) {
+			wc = rfb->request_keyevent(socket_fd, ev.value, 0xff0d);
+			printf("rq:[%d,%d], type:%x, code:%x, dwn-flag:%x\n", rc, wc, ev.type, ev.code, ev.value);
+		}
+	}
+
+	return NULL;
 }
 
 #define STR_LEN	30
@@ -36,15 +60,16 @@ int main_drm(int argc, char** argv)
 	struct drm_dev_t *drm_head;
 	uint8_t dri_path[STR_LEN] = {0};
 
-	int socket_fd = -1;
+	//int socket_fd = -1;
 	struct server_init_t si;
 	struct ops_rfb_t *rfb = get_rfb_instance();
 	struct ops_drm_t *drm = get_drm_instance();
 	struct framebuffer_dev_t fb_dev_rfb;
-	struct framebuffer_dev_t fb_dev_phy[6];
-	uint16_t pos_x, pos_y;
-	uint16_t rfb_x, rfb_y;
-	uint8_t idx = 0;
+	struct framebuffer_dev_t fb_dev_phy;
+	pthread_t pid_input;
+	//uint16_t pos_x, pos_y;
+	//uint16_t rfb_x, rfb_y;
+	//uint8_t idx = 0;
 
 	if(argc < 2) {
 		return usage_main_drm();
@@ -86,6 +111,7 @@ int main_drm(int argc, char** argv)
 		return -1;
 	}
 
+	pthread_create(&pid_input, NULL, &input_task, argv[4]);
 
 	fb_dev_rfb.width = si.fb_width;
 	fb_dev_rfb.height = si.fb_height;
@@ -95,70 +121,24 @@ int main_drm(int argc, char** argv)
 	fb_dev_rfb.depth = DEPTH;
 	fb_dev_rfb.bpp = si.fb_pixel_format.bit_per_pixel;
 
-#define SCALE_FACTOR	0.33
-	idx = 0;
-	fb_dev_phy[idx].width = (dev->width * SCALE_FACTOR);
-	fb_dev_phy[idx].height = (dev->height * SCALE_FACTOR);
-	fb_dev_phy[idx].x_pos = idx * (dev->width * SCALE_FACTOR);
-	fb_dev_phy[idx].y_pos = 0;
-	fb_dev_phy[idx].fb_ptr = dev->buf;
-	fb_dev_phy[idx].depth = DEPTH;
-	fb_dev_phy[idx].bpp = BPP;
-
-	fb_dev_phy[idx + 3].width = (dev->width * SCALE_FACTOR);
-	fb_dev_phy[idx + 3].height = (dev->height * SCALE_FACTOR);
-	fb_dev_phy[idx + 3].x_pos = idx * (dev->width * SCALE_FACTOR);
-	fb_dev_phy[idx + 3].y_pos = (dev->height * SCALE_FACTOR);
-	fb_dev_phy[idx + 3].fb_ptr = dev->buf;
-	fb_dev_phy[idx + 3].depth = DEPTH;
-	fb_dev_phy[idx + 3].bpp = BPP;
-
-	idx = 1;
-	fb_dev_phy[idx].width = (dev->width * SCALE_FACTOR);
-	fb_dev_phy[idx].height = (dev->height * SCALE_FACTOR);
-	fb_dev_phy[idx].x_pos = idx * (dev->width * SCALE_FACTOR);
-	fb_dev_phy[idx].y_pos = 0;
-	fb_dev_phy[idx].fb_ptr = dev->buf;
-	fb_dev_phy[idx].depth = DEPTH;
-	fb_dev_phy[idx].bpp = BPP;
-
-	fb_dev_phy[idx + 3].width = (dev->width * SCALE_FACTOR);
-	fb_dev_phy[idx + 3].height = (dev->height * SCALE_FACTOR);
-	fb_dev_phy[idx + 3].x_pos = idx * (dev->width * SCALE_FACTOR);
-	fb_dev_phy[idx + 3].y_pos = (dev->height * SCALE_FACTOR);
-	fb_dev_phy[idx + 3].fb_ptr = dev->buf;
-	fb_dev_phy[idx + 3].depth = DEPTH;
-	fb_dev_phy[idx + 3].bpp = BPP;
-
-	idx = 2;
-	fb_dev_phy[idx].width = (dev->width * SCALE_FACTOR);
-	fb_dev_phy[idx].height = (dev->height * SCALE_FACTOR);;
-	fb_dev_phy[idx].x_pos = idx * (dev->width * SCALE_FACTOR);
-	fb_dev_phy[idx].y_pos = 0;
-	fb_dev_phy[idx].fb_ptr = dev->buf;
-	fb_dev_phy[idx].depth = DEPTH;
-	fb_dev_phy[idx].bpp = BPP;
-
-	fb_dev_phy[idx + 3].width = (dev->width * SCALE_FACTOR);
-	fb_dev_phy[idx + 3].height = (dev->height * SCALE_FACTOR);
-	fb_dev_phy[idx + 3].x_pos = idx * (dev->width * SCALE_FACTOR);
-	fb_dev_phy[idx + 3].y_pos = (dev->height * SCALE_FACTOR);
-	fb_dev_phy[idx + 3].fb_ptr = dev->buf;
-	fb_dev_phy[idx + 3].depth = DEPTH;
-	fb_dev_phy[idx + 3].bpp = BPP;
+	fb_dev_phy.width = dev->width;
+	fb_dev_phy.height = dev->height;
+	fb_dev_phy.x_pos = 0;
+	fb_dev_phy.y_pos = 0;
+	fb_dev_phy.fb_ptr = dev->buf;
+	fb_dev_phy.depth = DEPTH;
+	fb_dev_phy.bpp = BPP;
 
 	do {
 		if (rfb->processor(socket_fd, &si, &fb_dev_rfb) < 0)
 			break;
 		
-		for(idx = 0;idx < 6;idx++){
-			for(pos_y=0;pos_y<fb_dev_phy[idx].height;pos_y++){
-				for(pos_x=0;pos_x<fb_dev_phy[idx].width;pos_x++){
-					rfb_x = (uint16_t)(((float)pos_x)/SCALE_FACTOR + 0.5);
-					rfb_y = (uint16_t)(((float)pos_y)/SCALE_FACTOR + 0.5);
-					uint32_t px = *(fb_dev_rfb.fb_ptr + ((rfb_y * fb_dev_rfb.width) + rfb_x));
-					*(fb_dev_phy[idx].fb_ptr + (((fb_dev_phy[idx].y_pos + pos_y) * dev->width) + (fb_dev_phy[idx].x_pos + pos_x))) = px;
-				}
+		for(uint16_t pos_y=0;pos_y<fb_dev_rfb.height;pos_y++){
+			for(uint16_t pos_x=0;pos_x<fb_dev_rfb.width;pos_x++){
+				uint16_t rfb_x = pos_x;//(uint16_t)(((float)pos_x)/SCALE_FACTOR + 0.5);
+				uint16_t rfb_y = pos_y;//(uint16_t)(((float)pos_y)/SCALE_FACTOR + 0.5);
+				uint32_t px = *(fb_dev_rfb.fb_ptr + ((rfb_y * fb_dev_rfb.width) + rfb_x));
+				*(fb_dev_phy.fb_ptr + (((fb_dev_phy.y_pos + pos_y) * dev->width) + (fb_dev_phy.x_pos + pos_x))) = px;
 			}
 		}
 

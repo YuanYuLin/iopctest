@@ -47,6 +47,10 @@ CFLAGS += -DUTILS_RFB
 LDFLAGS += -liopcrfb
 endif
 
+ifeq ($(SUPPORT_QMP), y)
+CFLAGS += -DUTILS_QMP
+endif
+
 SRC = 
 SRC += main.c
 SRC += main_uds.c
@@ -55,5 +59,6 @@ SRC += main_input.c
 SRC += main_lxc.c
 SRC += main_drm.c
 SRC += main_rfb.c
+SRC += main_qmp.c
 
 include Makefile.include.app

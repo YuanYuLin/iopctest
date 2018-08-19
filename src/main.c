@@ -30,6 +30,7 @@ static struct sub_fun_t list[] = {
 	MAIN_LXC_CREATE
 	MAIN_DRM
 	MAIN_RFB
+	MAIN_QMP
 	MAIN_END
 };
 

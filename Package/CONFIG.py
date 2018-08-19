@@ -20,6 +20,7 @@ def MAIN_ENV(args):
     ops.exportEnv(ops.setEnv("SUPPORT_DB", "n"))
     ops.exportEnv(ops.setEnv("SUPPORT_INPUT", "n"))
     ops.exportEnv(ops.setEnv("SUPPORT_LXC", "y"))
+    ops.exportEnv(ops.setEnv("SUPPORT_QMP", "y"))
 
     return False
 

@@ -39,6 +39,13 @@
 	#define MAIN_RFB
 #endif
 
+#ifdef UTILS_QMP
+	extern int main_qmp(int argc, char** argv);
+	#define MAIN_QMP { "main_qmp", main_qmp },
+#else
+	#define MAIN_QMP
+#endif
+
 #define MAIN_END	{ "", NULL }
 
 #endif
