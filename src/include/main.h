@@ -46,6 +46,9 @@
 	#define MAIN_QMP
 #endif
 
+extern int main_qemumonitor(int argc, char** argv);
+#define MAIN_QEMUMONITOR {"main_qemumonitor", main_qemumonitor },
+
 #define MAIN_END	{ "", NULL }
 
 #endif

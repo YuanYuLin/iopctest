@@ -60,5 +60,6 @@ SRC += main_lxc.c
 SRC += main_drm.c
 SRC += main_rfb.c
 SRC += main_qmp.c
+SRC += main_qemumonitor.c
 
 include Makefile.include.app

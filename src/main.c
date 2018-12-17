@@ -31,6 +31,7 @@ static struct sub_fun_t list[] = {
 	MAIN_DRM
 	MAIN_RFB
 	MAIN_QMP
+	MAIN_QEMUMONITOR
 	MAIN_END
 };
 
