@@ -1,4 +1,4 @@
-#ifdef UTILS_QMP
+#ifdef UTILS_QEMU
 
 #include <sys/socket.h>
 #include <sys/epoll.h>

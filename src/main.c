@@ -24,16 +24,24 @@ struct sub_fun_t {
 };
 
 static struct sub_fun_t list[] = {
-	MAIN_UDS
-	MAIN_DB
-	MAIN_INPUT
-	MAIN_LXC_CREATE
-	MAIN_DRM
-	MAIN_RFB
-	MAIN_QMP
-	MAIN_QEMUMONITOR
+	MAIN_UDS,
+	MAIN_DB,
+	MAIN_INPUT,
+	MAIN_LXC_CREATE,
+	MAIN_DRM,
+	MAIN_RFB,
+	MAIN_QMP,
+	MAIN_QEMUMONITOR,
+	MAIN_UNITTEST,
+	MAIN_MD,
 	MAIN_END
 };
+
+int main_dummy(int argc, char** argv)
+{
+    printf("%s not supported.\n", argv[0]);
+    return 0;
+}
 
 static void main_usage()
 {

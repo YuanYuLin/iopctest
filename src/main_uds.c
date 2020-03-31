@@ -54,7 +54,7 @@ int main_uds(int argc, char** argv)
 
 	printf("cli %d, %d\n", req_msg.data_size, argc);
 
-	net->uds_client_send_and_recv(&req_msg, &res_msg);
+	net->uds_client_send_and_recv(SOCKET_PATH_WWW, &req_msg, &res_msg);
 
 	printf("cli fn : %x\n", res_msg.fn);
 	printf("cli cmd : %x\n", res_msg.cmd);

@@ -19,7 +19,7 @@
 #include "ops_log.h"
 #include "ops_task.h"
 #include "ops_net.h"
-#include "ops_rfb.h"
+//#include "ops_rfb.h"
 #include "ops_drm.h"
 
 //static int socket_fd = -1;
